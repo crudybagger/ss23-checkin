@@ -11,12 +11,16 @@
     <div>
         <% if ((user.paidForRegDay1 || user.paidForRegDay2 || user.paidForRegDay3)) { %>
           <span style="color: green">&#10003;</span> <%= user.name %> is registered.
-          <button onclick="checkIn('<%= user.uniqueId %>')">Check-In</button>
-        <% } else { %>
+          <% if (checkedIN) { %>
+            <span style="color: green">&#10003;</span> <%= user.name %> has checked-in.
+            <button onclick="checkIn('<%= user.uniqueId %>',<%= checkedIN %>)">Check-Out</button>
+          <% } else { %>
+          <button onclick="checkIn('<%= user.uniqueId %>',<%= checkedIN %>)">Check-In</button>
+        <% }} else { %>
           <%= user.name %> has not registered for any registration day yet.
         <% } %>
       </div>
-      <% for(var i = 0; i < 4; i++) { %>
+      <!-- <% for(var i = 0; i < 4; i++) { %>
       <div>
         <% if (user.paidForAccomodationDay3) { %>
           <span style="color: green">&#10003;</span> <%= user.name %> is registered for Accomodation Day 2.
@@ -31,17 +35,17 @@
           <%= user.name %> has not registered for Proshow <%=i+1 %> yet.
         <% } %>
       </div>
-        <% } %>
+        <% } %> -->
       
 </body>
 <script>
-    let checkIn = async (userId) => {
+    let checkIn = async (userId, checkedIN) => {
       let res = await fetch('/checkin/' + userId, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ userId: userId, token: localStorage.getItem('token') })
+        body: JSON.stringify({token: localStorage.getItem('token')})
       })
       .then(response => {
         return response.json();
@@ -52,9 +56,11 @@
       });
       let response = await res;
       if(response.status === "success") {
-        alert('Check-in successful.');
+        checkedIN ? alert("Check-out successful.") : alert('Check-in successful.');
+        window.location.reload();
       } else {
-        alert('Check-in failed.');
+        checkedIN ? alert("Check-out failed.") : alert('Check-in failed.');
+        window.location.reload();
       }
     }
     </script>

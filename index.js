@@ -2,6 +2,7 @@ let express = require('express');
 let app = express();
 let mongoose = require("mongoose");
 let Registration = require("./models/Registration");
+let Checkin = require("./models/Checkin");
 let cookieParser = require("cookie-parser");
 let bodyParser = require("body-parser");
 let ejs = require("ejs");
@@ -66,12 +67,23 @@ app.post("/checkin/:id", checkToken, async (req, res) => {
     // render checkin page
     // pass the id as a parameter
     // id is the reg no. of the student
-    console.log(req.body);
-    let user = await Registration.findOne({uniqueId: req.params.id}).then((user) => {
+    let checkin = await Checkin.findOne({uniqueId: req.params.id}).then((user) => {
         return user;
     }).catch((err) => {
         console.log(err);
     });
+    if(!checkin) {
+        checkin = new Checkin({
+            uniqueId: req.params.id,
+            checkedIN: true,
+        });
+    }
+    if(checkin.checkedIN) {
+        checkin.checkedIN = false;
+    } else {
+        checkin.checkedIN = true;
+    }
+    await checkin.save();
     res.json({status: "success"});
 });
 app.get("/checkin/:id", checkToken, async (req, res) => {
@@ -83,7 +95,16 @@ app.get("/checkin/:id", checkToken, async (req, res) => {
     }).catch((err) => {
         console.log(err);
     });
-    if(user) res.render("checkin", {user: user});
+    let checkin = await Checkin.findOne({uniqueId: req.params.id}).then((user) => {
+        return user;
+    }).catch((err) => {
+        console.log(err);
+    });
+    if(checkin?.checkedIN) {
+        res.render("checkin", {user: user, checkedIN: true});
+    } else {
+        res.render("checkin", {user: user, checkedIN: false});
+    }
 });
 
 app.get("/*", (req, res) => {
