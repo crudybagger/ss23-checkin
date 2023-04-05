@@ -41,12 +41,12 @@ app.post("/login", (req, res) => {
     // Check if password is correct
     // if correct, set cookie and redirect to /checkin
     // else redirect to /login
+    let response = {status : "error"};
     if (req.body.password == process.env.PASSWORD) {
         res.cookie("token", process.env.PASSWORD);
-        res.json({status: "success"});
-    } else {
-        res.json({status: "error"});
+        response.status = "success";
     }
+    res.json(response);
 });
 let checkToken = (req, res, next) => {
     // check if token is present
@@ -56,18 +56,17 @@ let checkToken = (req, res, next) => {
     // res.redirect("/login/" + req.params.id);
     // console.log(req.cookies["token"]);
     // if (req.cookies["token"]) {
-        if (req.cookies["token"] == process.env.PASSWORD) {
-            next();
-        }
-        res.redirect("/login");
-    // } else {
-    //     res.redirect("/login/" + req.params.id);
-    // }
+    if (req.cookies["token"] == process.env.PASSWORD) {
+        next();
+    } else {
+        res.redirect("/login/" + req.params.id);
+    }
 };
 app.post("/checkin/:id", checkToken, async (req, res) => {
     // render checkin page
     // pass the id as a parameter
     // id is the reg no. of the student
+    console.log(req.body);
     let user = await Registration.findOne({uniqueId: req.params.id}).then((user) => {
         return user;
     }).catch((err) => {
@@ -84,12 +83,12 @@ app.get("/checkin/:id", checkToken, async (req, res) => {
     }).catch((err) => {
         console.log(err);
     });
-    res.render("checkin", {user: user, id: req.params.id});
+    if(user) res.render("checkin", {user: user});
 });
 
 app.get("/*", (req, res) => {
     // redirect to /login
-    res.redirect("/login/noId");
+    res.redirect("/login");
 });
 app.listen(process.env.PORT || 3030, () => {
     console.log("Started at 3030");
