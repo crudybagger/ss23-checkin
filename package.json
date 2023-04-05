@@ -1,0 +1,28 @@
+{
+  "name": "checkin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "set PORT=3030 && nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/crudybagger/ss23-checkin.git"
+  },
+  "author": "Sarang Nagpal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/crudybagger/ss23-checkin/issues"
+  },
+  "homepage": "https://github.com/crudybagger/ss23-checkin#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2",
+    "mongoose": "^7.0.3"
+  }
+}

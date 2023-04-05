@@ -1,0 +1,61 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkin</title>
+</head>
+<body>
+    <!-- Display user in ejs parameter -->
+    <h1>Welcome <%= user.name %></h1>
+    <div>
+        <% if ((user.paidForRegDay1 || user.paidForRegDay2 || user.paidForRegDay3)) { %>
+          <span style="color: green">&#10003;</span> <%= user.name %> is registered.
+          <button onclick="checkIn('<%= user.uniqueId %>')">Check-In</button>
+        <% } else { %>
+          <%= user.name %> has not registered for any registration day yet.
+        <% } %>
+      </div>
+      <% for(var i = 0; i < 4; i++) { %>
+      <div>
+        <% if (user.paidForAccomodationDay3) { %>
+          <span style="color: green">&#10003;</span> <%= user.name %> is registered for Accomodation Day 2.
+        <% } %>
+      </div>
+        <% } %>
+      <% for(var i = 0; i < 3; i++) { %>
+      <div>
+        <% if (user["paidForProshow" + i]) { %>
+          <span style="color: green">&#10003;</span> <%= user.name %> is registered for Proshow 1.
+        <% } else { %>
+          <%= user.name %> has not registered for Proshow <%=i+1 %> yet.
+        <% } %>
+      </div>
+        <% } %>
+      
+</body>
+<script>
+    let checkIn = async (userId) => {
+      let res = await fetch('/checkin/' + userId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: userId, token: localStorage.getItem('token') })
+      })
+      .then(response => {
+        return response.json();
+      })
+      .catch(error => {
+        console.error(error);
+        alert('Check-in failed.');
+      });
+      let response = await res;
+      if(response.status === "success") {
+        alert('Check-in successful.');
+      } else {
+        alert('Check-in failed.');
+      }
+    }
+    </script>
+</html>
